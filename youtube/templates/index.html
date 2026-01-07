@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YDY YouTube Downloader</title>
+    <style>
+        /* 깔끔한 다크모드 디자인 */
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h2 { color: #3498db; margin-bottom: 25px; }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background-color: #2c2c2c;
+            color: white;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: none;
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover { background-color: #2980b9; }
+        button:disabled { background-color: #555; cursor: not-allowed; }
+        #status {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #f1c40f;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>YDY Downloader</h2>
+    
+    <input type="password" id="password" placeholder="비밀번호 (ydy)">
+    
+    <input type="text" id="url" placeholder="유튜브 링크를 붙여넣으세요">
+    
+    <select id="resolution">
+        <option value="Best">최고 화질 (Best)</option>
+        <option value="1080p">1080p (Full HD)</option>
+        <option value="720p">720p (HD)</option>
+        <option value="480p">480p</option>
+        <option value="360p">360p</option>
+    </select>
+    
+    <button id="downloadBtn" onclick="startDownload()">다운로드 시작</button>
+    
+    <div id="status">대기 중...</div>
+</div>
+
+<script>
+    async function startDownload() {
+        const url = document.getElementById('url').value;
+        const password = document.getElementById('password').value;
+        const res = document.getElementById('resolution').value;
+        const status = document.getElementById('status');
+        const btn = document.getElementById('downloadBtn');
+
+        if (!url || !password) {
+            alert("URL과 비밀번호를 모두 입력해주세요.");
+            return;
+        }
+
+        // 버튼 비활성화
+        btn.disabled = true;
+        btn.innerText = "처리 중...";
+        status.innerText = "서버에서 영상 처리 중입니다. 잠시만 기다리세요...";
+
+        try {
+            const response = await fetch('/download', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: url, password: password, resolution: res })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                status.innerText = "성공! 영상이 서버에 저장되었습니다.";
+                status.style.color = "#2ecc71";
+            } else {
+                status.innerText = "오류: " + result.message;
+                status.style.color = "#e74c3c";
+            }
+        } catch (error) {
+            status.innerText = "서버 연결 실패!";
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "다운로드 시작";
+        }
+    }
+</script>
+
+</body>
+</html>
