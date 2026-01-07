@@ -1,26 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-    <title>YDY Downloader</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YDY YouTube Downloader</title>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        body { background-color: #121212; color: #ffffff; font-family: 'Arial', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background-color: #1e1e1e; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 400px; text-align: center; }
+        h1 { color: #f1c40f; margin-bottom: 25px; font-size: 24px; }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border: none; border-radius: 8px; background-color: #333; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; background-color: #f1c40f; color: #121212; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        button:hover { background-color: #d4ac0d; }
         #download-section { display: none; } /* 처음엔 숨김 */
     </style>
 </head>
 <body>
-    <h1>YDY YouTube Downloader</h1>
+    <div class="container">
+        <h1>YDY Downloader</h1>
+        
+        <div id="login-section">
+            <input type="password" id="pw-input" placeholder="Password (ydy)">
+            <button onclick="checkPassword()">로그인</button>
+        </div>
 
-    <div id="login-section">
-        <input type="password" id="pw-input" placeholder="비밀번호 입력">
-        <button onclick="checkPassword()">확인</button>
-    </div>
-
-    <div id="download-section">
-        <form action="/download" method="post">
-            <input type="hidden" name="password" id="final-pw">
-            <input type="text" name="url" placeholder="유튜브 링크 주소" style="width: 300px;">
-            <button type="submit">다운로드 시작</button>
-        </form>
+        <div id="download-section">
+            <form action="/download" method="post">
+                <input type="hidden" name="password" id="final-pw">
+                <input type="text" name="url" placeholder="유튜브 링크 주소" required>
+                <button type="submit">다운로드 시작</button>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -29,7 +38,7 @@
             if (pw === 'ydy') {
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('download-section').style.display = 'block';
-                document.getElementById('final-pw').value = pw; // 폼에 비밀번호 전달
+                document.getElementById('final-pw').value = pw;
             } else {
                 alert('비밀번호가 틀렸습니다!');
             }
