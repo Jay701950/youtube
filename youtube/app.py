@@ -1,5 +1,6 @@
+from flask import Flask, render_template, request, send_file
+import yt_dlp
 import os
-from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
@@ -9,16 +10,30 @@ def index():
 
 @app.route('/download', methods=['POST'])
 def download():
-    data = request.json
-    if data.get('password') != 'ydy':
-        return jsonify({'success': False, 'message': '비밀번호 틀림!'})
-    
-    # Render 서버의 용량 제한 때문에 실제 다운로드 로직은 
-    # 테스트 후 클라우드 저장소(S3 등)나 바로 전송 방식으로 고도화가 필요합니다.
-    # 일단은 기본 로직을 유지합니다.
-    return jsonify({'success': True, 'message': '서버 연결 성공!'})
+    # 비밀번호 확인
+    password = request.form.get('password')
+    url = request.form.get('url')
+
+    if password != 'ydy':
+        return "비밀번호가 틀렸습니다.", 403
+
+    if not url:
+        return "URL을 입력해주세요.", 400
+
+    # 다운로드 설정
+    ydl_opts = {
+        'format': 'best',
+        'outtmpl': 'downloaded_video.mp4',
+        'noplaylist': True,
+    }
+
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+        
+        return send_file('downloaded_video.mp4', as_attachment=True)
+    except Exception as e:
+        return f"에러 발생: {str(e)}", 500
 
 if __name__ == '__main__':
-    # Render에서 지정하는 포트를 사용하도록 설정
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 10000)))
