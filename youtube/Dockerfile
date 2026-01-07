@@ -14,4 +14,5 @@ ENV PORT=10000
 EXPOSE 10000
 
 # 서버 실행
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:10000"]
+CMD gunicorn app:app --bind 0.0.0.0:$PORT
+
